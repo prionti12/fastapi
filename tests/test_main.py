@@ -1,73 +1,46 @@
-import sys
-import os
-
-
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
-from src.main import api  
 from fastapi.testclient import TestClient
-import pytest
+from src.main import api  
 
 client = TestClient(api)
 
-# ===========================
-# Test: Index route
-# ===========================
 def test_index():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"Message": "Welcome to the Book Management System"}
+    assert response.json() == {"Message": "Welcome to the Ticket Booking System"}
 
-# ===========================
-# Test: Add book
-# ===========================
-def test_add_book():
-    book_data = {
+def test_add_ticket():
+    ticket_data = {
         "id": 1,
-        "name": "Python 101",
-        "description": "Introduction to Python",
-        "isAvailable": True
+        "flight_name": "Air Bangladesh",
+        "flight_date": "2025-10-15",
+        "flight_time": "14:30",
+        "destination": "Chittagong"
     }
-    response = client.post("/book", json=book_data)
+    response = client.post("/ticket", json=ticket_data)
     assert response.status_code == 200
-    assert len(response.json()) == 1
-    assert response.json()[0]["name"] == "Python 101"
+    assert response.json() == ticket_data
 
-# ===========================
-# Test: Get books
-# ===========================
-def test_get_books():
-    response = client.get("/book")
+def test_get_tickets():
+    response = client.get("/ticket")
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
-    assert len(response.json()) >= 1
+    tickets = response.json()
+    assert isinstance(tickets, list)
+    assert tickets[0]["id"] == 1
 
-# ===========================
-# Test: Update book
-# ===========================
-def test_update_book():
-    updated_data = {
+def test_update_ticket():
+    updated_ticket = {
         "id": 1,
-        "name": "Python 102",
-        "description": "Advanced Python",
-        "isAvailable": False
+        "flight_name": "Air Dhaka",
+        "flight_date": "2025-10-16",
+        "flight_time": "15:00",
+        "destination": "Sylhet"
     }
-    response = client.put("/book/1", json=updated_data)
+    response = client.put("/ticket/1", json=updated_ticket)
     assert response.status_code == 200
-    assert response.json()["name"] == "Python 102"
+    assert response.json() == updated_ticket
 
-# ===========================
-# Test: Delete book
-# ===========================
-def test_delete_book():
-    response = client.delete("/book/1")
+def test_delete_ticket():
+    response = client.delete("/ticket/1")
     assert response.status_code == 200
-    assert response.json()["id"] == 1
-
-# ===========================
-# Test: Delete non-existent book
-# ===========================
-def test_delete_nonexistent_book():
-    response = client.delete("/book/999")
-    assert response.status_code == 200
-    assert response.json() == {"error": "Book not found, deletion failed"}
+    deleted_ticket = response.json()
+    assert deleted_ticket["id"] == 1

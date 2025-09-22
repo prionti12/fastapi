@@ -1,0 +1,68 @@
+name: FastAPI CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Job 1: TEST
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.9
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+    
+    - name: Run pytest
+      run: |
+        pytest test_main.py -v
+
+  # Job 2: BUILD  
+  build:
+    name: Build Application
+    needs: test  # Test pass hole ei job run hobe
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.9
+    
+    - name: Build app
+      run: |
+        echo "✅ Building FastAPI application..."
+        python -m py_compile main.py
+        echo "✅ Build successful!"
+
+  # Job 3: DEPLOY
+  deploy:
+    name: Deploy Application  
+    needs: [test, build]  # Test ar Build pass hole deploy hobe
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # Sudhu main branch e deploy
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Deploy
+      run: |
+        echo "🚀 Deploying to production..."
+        echo "✅ Deployment successful!"
+        echo "🌐 App URL: https://my-fastapi-app.com"

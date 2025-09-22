@@ -4,39 +4,46 @@ from typing import List
 
 api = FastAPI()
 
-class Book(BaseModel):
+class Ticket(BaseModel):
     id: int
-    name: str
-    description: str
-    isAvailable: bool
+    flight_name: str
+    flight_date: str  # Example: "2025-10-15"
+    flight_time: str  # Example: "14:30"
+    destination: str
 
-books: List[Book] = []
+tickets: List[Ticket] = []
 
 @api.get("/")
 def index():
-    return {"Message": "Welcome to the Book Management System"}
+    return {"Message": "Welcome to the Ticket Booking System"}
 
-@api.get("/book")
-def get_books():
-    return books
 
-@api.post("/book")
-def add_book(book: Book):
-    books.append(book)
-    return books
+@api.get("/ticket")
+def get_tickets():
+    return tickets
 
-@api.put("/book/{book_id}")
-def update_book(book_id: int, updated_book: Book):
-    for index, book in enumerate(books):
-        if book.id == book_id:
-            books[index] = updated_book
-            return updated_book
-    return {"error": "Book Not Found"}
 
-@api.delete("/book/{book_id}")
-def delete_book(book_id: int):
-    for index, book in enumerate(books):
-        if book.id == book_id:
-            deleted_book = books.pop(index)
-            return deleted_book
-    return {"error": "Book not found, deletion failed"}
+@api.post("/ticket")
+def add_ticket(ticket: Ticket):
+    tickets.append(ticket)
+    return ticket
+
+
+@api.put("/ticket/{ticket_id}")
+def update_ticket(ticket_id: int, updated_ticket: Ticket):
+    for index, ticket in enumerate(tickets):
+        if ticket.id == ticket_id:
+            tickets[index] = updated_ticket
+            return updated_ticket
+    return {"error": "Ticket Not Found"}
+
+
+
+@api.delete("/ticket/{ticket_id}")
+def delete_ticket(ticket_id: int):
+    for index, ticket in enumerate(tickets):
+        if ticket.id == ticket_id:
+            deleted_ticket = tickets.pop(index)
+            return deleted_ticket
+    
+    return {"error": "Ticket not found, deletion failed"}
